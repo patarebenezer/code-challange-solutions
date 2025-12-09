@@ -1,14 +1,6 @@
 // src/components/TokenSelect/TokenOption.tsx
 import { TokenIcon } from "@/components/TokenIcon";
-import type { Token } from "@/types";
-
-type Props = {
- token: Token;
- active: boolean;
- selected: boolean;
- onHover: () => void;
- onPick: () => void;
-};
+import type { TokenOptionProps } from "@/types";
 
 export function TokenOption({
  token,
@@ -16,7 +8,7 @@ export function TokenOption({
  selected,
  onHover,
  onPick,
-}: Props) {
+}: TokenOptionProps) {
  return (
   <li role='option' aria-selected={selected}>
    <button

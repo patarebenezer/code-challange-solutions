@@ -1,13 +1,6 @@
 // src/components/TokenSelect/TokenSelectButton.tsx
 import { TokenIcon } from "@/components/TokenIcon";
-
-type Props = {
- label: string;
- value: string;
- open: boolean;
- onToggle: () => void;
- onKeyDown: (e: React.KeyboardEvent) => void;
-};
+import type { TokenSelectButtonProps } from "@/types";
 
 export function TokenSelectButton({
  label,
@@ -15,7 +8,7 @@ export function TokenSelectButton({
  open,
  onToggle,
  onKeyDown,
-}: Props) {
+}: TokenSelectButtonProps) {
  return (
   <>
    <label className='block text-sm text-slate-300 mb-1'>{label}</label>

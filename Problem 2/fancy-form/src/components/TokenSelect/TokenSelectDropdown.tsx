@@ -1,20 +1,6 @@
 // src/components/TokenSelect/TokenSelectDropdown.tsx
-import React from "react";
-import type { Token } from "@/types";
-import { TokenOption } from "./TokenOption";
-
-type Props = {
- label: string;
- value: string;
- q: string;
- filtered: Token[];
- activeIdx: number;
- inputRef: React.RefObject<HTMLInputElement | null>;
- onQueryChange: (v: string) => void;
- onKeyDown: (e: React.KeyboardEvent) => void;
- onHoverIdx: (idx: number) => void;
- onPick: (sym: string) => void;
-};
+import { TokenOption } from "@/components/TokenSelect/TokenOption";
+import type { TokenSelectDropdownProps } from "@/types";
 
 export function TokenSelectDropdown({
  label,
@@ -27,7 +13,7 @@ export function TokenSelectDropdown({
  onKeyDown,
  onHoverIdx,
  onPick,
-}: Props) {
+}: TokenSelectDropdownProps) {
  return (
   <div className='absolute z-20 mt-2 w-full rounded-xl bg-slate-900 border border-slate-700 shadow-xl overflow-hidden'>
    <div className='p-2'>

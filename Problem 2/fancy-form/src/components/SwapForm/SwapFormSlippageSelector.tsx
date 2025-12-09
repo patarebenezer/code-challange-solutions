@@ -1,15 +1,13 @@
 // src/components/SwapForm/SwapFormSlippageSelector.tsx
 import { useMemo, useState } from "react";
+import type { SlippageSelectorProps } from "@/types";
 
 const SLIPPAGE_PRESETS = [0.1, 0.5, 1.5];
 
 export function SwapFormSlippageSelector({
  value,
  onChange,
-}: {
- value: number;
- onChange: (n: number) => void;
-}) {
+}: SlippageSelectorProps) {
  const [customSlip, setCustomSlip] = useState("");
 
  const isPresetActive = useMemo(

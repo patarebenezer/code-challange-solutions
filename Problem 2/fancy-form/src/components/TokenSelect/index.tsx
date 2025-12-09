@@ -2,16 +2,14 @@
 import { useTokenSelect } from "@/hooks/useTokenSelect";
 import { TokenSelectButton } from "@/components/TokenSelect/TokenSelectButton";
 import { TokenSelectDropdown } from "@/components/TokenSelect/TokenSelectDropdown";
-import type { Token } from "@/types";
+import type { TokenSelectProps } from "@/types";
 
-type Props = {
- tokens: Token[];
- value: string;
- onChange: (sym: string) => void;
- label: string;
-};
-
-export function TokenSelect({ tokens, value, onChange, label }: Props) {
+export function TokenSelect({
+ tokens,
+ value,
+ onChange,
+ label,
+}: TokenSelectProps) {
  const {
   state: { open, q, activeIdx },
   refs: { boxRef, inputRef },

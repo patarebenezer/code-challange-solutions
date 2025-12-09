@@ -1,17 +1,6 @@
 // src/components/SwapForm/SwapFormAmountInput.tsx
+import type { AmountInputProps } from "@/types";
 import React, { useCallback } from "react";
-
-type Props = {
- value: string;
- token: string;
- balance: number;
- touched: boolean;
- isValid: boolean;
- isOverBalance: boolean;
- onChange: (raw: string) => void;
- onBlur: () => void;
- onMax: () => void;
-};
 
 export function SwapFormAmountInput({
  value,
@@ -23,7 +12,7 @@ export function SwapFormAmountInput({
  onChange,
  onBlur,
  onMax,
-}: Props) {
+}: AmountInputProps) {
  const handleChange = useCallback(
   (e: React.ChangeEvent<HTMLInputElement>) => {
    const raw = e.target.value.replace(/[, ]+/g, "");

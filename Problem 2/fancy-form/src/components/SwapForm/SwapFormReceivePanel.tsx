@@ -1,16 +1,6 @@
 // src/components/SwapForm/SwapFormReceivePanel.tsx
 import { useMemo } from "react";
-
-type Props = {
- fromToken: string;
- toToken: string;
- hasPrices: boolean;
- isFromValid: boolean;
- rate: number;
- toAmount: number;
- slippagePct: number;
- usdValue: number;
-};
+import type { ReceivePanelProps } from "@/types";
 
 export function SwapFormReceivePanel({
  fromToken,
@@ -21,7 +11,7 @@ export function SwapFormReceivePanel({
  toAmount,
  slippagePct,
  usdValue,
-}: Props) {
+}: ReceivePanelProps) {
  const receiveText = useMemo(
   () => (isFromValid && hasPrices ? toAmount.toFixed(6) : "0.000000"),
   [isFromValid, hasPrices, toAmount]
