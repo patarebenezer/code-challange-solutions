@@ -1,0 +1,188 @@
+CODE REVIEW AND REFACTORING NOTES
+==================================
+----------------------------------------------------------------
+
+ISSUE 1: Missing blockchain property in WalletBalance interface
+
+Original Code (Lines 1-4):
+interface WalletBalance {
+  currency: string;
+  amount: number;
+}
+
+Problem: The interface is missing the 'blockchain' property, but it's used throughout the code (e.g., balance.blockchain inside filter/sort).
+
+Fixed Code:
+interface WalletBalance {
+  currency: string;
+  amount: number;
+  blockchain: string;
+}
+
+----------------------------------------------------------------
+
+ISSUE 2: getPriority defined inside component and typed as any
+
+Original Code (Lines 17-34):
+const WalletPage: React.FC<Props> = (props: Props) => {
+  ...
+  const getPriority = (blockchain: any): number => {
+    switch (blockchain) { ... }
+  }
+
+Problems:
+1. Function is re-created on every render. This is a mild but real perf smell and hurts memo stability if later used in deps.
+2. Using 'any' removes type safety and hides typos/unsupported chains.
+
+Fixed Code:
+const PRIORITY: Record<string, number> = {
+  Osmosis: 100,
+  Ethereum: 50,
+  Arbitrum: 30,
+  Zilliqa: 20,
+  Neo: 20,
+};
+
+const getPriority = (blockchain: string): number =>
+  PRIORITY[blockchain] ?? -99;
+
+const WalletPage: React.FC<Props> = (props: Props) => { ... }
+
+----------------------------------------------------------------
+
+ISSUE 3: Undefined variable and inverted filtering logic
+
+Original Code (Lines 37-44):
+return balances.filter((balance: WalletBalance) => {
+  const balancePriority = getPriority(balance.blockchain);
+  if (lhsPriority > -99) {
+    if (balance.amount <= 0) {
+      return true;
+    }
+  }
+  return false
+})
+
+Problems:
+1. References 'lhsPriority' which is never defined; should be 'balancePriority' → runtime crash.
+2. Logic keeps balances with amount <= 0 (zero/negative) instead of positive balances.
+3. Condition structure is unnecessarily nested and hard to read.
+
+Fixed Code:
+const filteredBalances = balances.filter((balance: WalletBalance) => {
+  const priority = getPriority(balance.blockchain);
+  return priority > -99 && balance.amount > 0;
+});
+
+----------------------------------------------------------------
+
+ISSUE 4: Incorrect useMemo dependencies
+
+Original Code (Line 54):
+}, [balances, prices]);
+
+Problem: 'prices' is included as a dependency but not used in the memo body. Any price refresh triggers a re-filter + re-sort even though results don't change.
+
+Impact: Unnecessary O(n log n) work on every price tick.
+
+Fixed Code:
+}, [balances]);
+
+----------------------------------------------------------------
+
+ISSUE 5: Sort comparator missing tie return
+
+Original Code (Lines 45-53):
+.sort((lhs: WalletBalance, rhs: WalletBalance) => {
+  const leftPriority = getPriority(lhs.blockchain);
+  const rightPriority = getPriority(rhs.blockchain);
+  if (leftPriority > rightPriority) {
+    return -1;
+  } else if (rightPriority > leftPriority) {
+    return 1;
+  }
+});
+
+Problem: When priorities are equal, comparator returns undefined. That violates the comparator contract and can cause unstable ordering.
+
+Fixed Code:
+.sort((a, b) => b.priority - a.priority);
+
+----------------------------------------------------------------
+
+ISSUE 6: Priority recomputed repeatedly during filter + sort
+
+Original Code:
+- getPriority called once per element in filter, then twice per comparison in sort.
+
+Problem: Sorting is O(n log n) comparisons; recomputing priority for each compare is avoidable overhead.
+
+Fixed Code:
+Precompute priority once per balance (decorate-sort-undecorate):
+const formattedBalances = balances
+  .map(b => ({ ...b, priority: getPriority(b.blockchain), formatted: b.amount.toFixed() }))
+  .filter(b => b.priority > -99 && b.amount > 0)
+  .sort((a, b) => b.priority - a.priority);
+
+----------------------------------------------------------------
+
+ISSUE 7: Redundant formattedBalances variable and wrong array used for rows
+
+Original Code (Lines 56-74):
+const formattedBalances = sortedBalances.map((balance: WalletBalance) => ({
+  ...balance,
+  formatted: balance.amount.toFixed()
+}));
+
+const rows = sortedBalances.map((balance: FormattedWalletBalance, index: number) => {
+  ...
+  formattedAmount={balance.formatted}
+})
+
+Problems:
+1. formattedBalances is computed but never used → wasted pass + memory.
+2. rows maps over sortedBalances but assumes FormattedWalletBalance → type mismatch.
+3. balance.formatted is undefined for items from sortedBalances.
+
+Fixed Code:
+Use formattedBalances directly for rows.
+
+----------------------------------------------------------------
+
+ISSUE 8: Using index as React key (Anti-pattern)
+
+Original Code (Line 68):
+key={index}
+
+Problem: The list is sorted, so indices change between renders. React will remount rows, losing any local state and doing extra DOM work.
+
+Fixed Code:
+key={`${balance.blockchain}:${balance.currency}`}
+
+----------------------------------------------------------------
+
+ISSUE 9: Potential NaN USD values on missing prices
+
+Original Code:
+const usdValue = prices[balance.currency] * balance.amount;
+
+Problem: If prices[balance.currency] is undefined, usdValue becomes NaN and pollutes the UI.
+
+Fixed Code:
+const price = prices[balance.currency] ?? 0;
+const usdValue = price * balance.amount;
+
+----------------------------------------------------------------
+
+ISSUE 10: Unused children destructuring
+
+Original Code (Line 15):
+const { children, ...rest } = props;
+
+Problem: children is never rendered, so this is dead code and misleading.
+
+Fixed Code:
+Render {children} in return (or remove destructure).
+
+----------------------------------------------------------------
+
