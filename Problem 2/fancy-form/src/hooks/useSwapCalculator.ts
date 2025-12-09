@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { PricesMap } from "@/hooks/usePrices";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import type { PricesMap, Token } from "@/types";
 
-type TokenItem = { symbol: string; price: number };
+type TokenItem = Token;
 
 export function useSwapCalculator(tokens: TokenItem[], prices: PricesMap) {
  const [fromToken, setFromToken] = useState("");

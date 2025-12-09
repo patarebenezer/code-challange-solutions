@@ -1,10 +1,5 @@
 import { useCallback, useState } from "react";
-
-export type Toast = {
- id: string;
- type: "success" | "error" | "info";
- message: string;
-};
+import type { Toast } from "@/types";
 
 export function useToast() {
  const [toasts, setToasts] = useState<Toast[]>([]);
@@ -14,9 +9,7 @@ export function useToast() {
   setToasts((t) => [...t, { id, type, message }]);
 
   const removeToast = (t: Toast[]) => t.filter((x) => x.id !== id);
-  setTimeout(() => {
-   setToasts(removeToast);
-  }, 2500);
+  setTimeout(() => setToasts(removeToast), 2500);
  }, []);
 
  return {
