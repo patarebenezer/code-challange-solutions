@@ -2,7 +2,7 @@
 import { useTokenSelect } from "@/hooks/useTokenSelect";
 import { TokenSelectButton } from "@/components/TokenSelect/TokenSelectButton";
 import { TokenSelectDropdown } from "@/components/TokenSelect/TokenSelectDropdown";
-import type { TokenSelectProps } from "@/types";
+import type { TokenSelectProps } from "@/components/TokenSelect/types";
 
 export function TokenSelect({
  tokens,

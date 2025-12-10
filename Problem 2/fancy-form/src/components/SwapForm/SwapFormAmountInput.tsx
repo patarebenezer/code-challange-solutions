@@ -1,6 +1,6 @@
 // src/components/SwapForm/SwapFormAmountInput.tsx
-import type { AmountInputProps } from "@/types";
 import React, { useCallback } from "react";
+import type { AmountInputProps } from "@/components/SwapForm/types";
 
 export function SwapFormAmountInput({
  value,

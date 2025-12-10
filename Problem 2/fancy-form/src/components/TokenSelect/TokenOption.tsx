@@ -1,6 +1,6 @@
 // src/components/TokenSelect/TokenOption.tsx
 import { TokenIcon } from "@/components/TokenIcon";
-import type { TokenOptionProps } from "@/types";
+import type { TokenOptionProps } from "@/components/TokenSelect/types";
 
 export function TokenOption({
  token,

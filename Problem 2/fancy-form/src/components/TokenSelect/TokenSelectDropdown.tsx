@@ -1,6 +1,6 @@
 // src/components/TokenSelect/TokenSelectDropdown.tsx
 import { TokenOption } from "@/components/TokenSelect/TokenOption";
-import type { TokenSelectDropdownProps } from "@/types";
+import type { TokenSelectDropdownProps } from "@/components/TokenSelect/types";
 
 export function TokenSelectDropdown({
  label,

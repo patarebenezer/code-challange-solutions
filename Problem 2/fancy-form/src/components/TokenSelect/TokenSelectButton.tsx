@@ -1,6 +1,6 @@
 // src/components/TokenSelect/TokenSelectButton.tsx
 import { TokenIcon } from "@/components/TokenIcon";
-import type { TokenSelectButtonProps } from "@/types";
+import type { TokenSelectButtonProps } from "@/components/TokenSelect/types";
 
 export function TokenSelectButton({
  label,

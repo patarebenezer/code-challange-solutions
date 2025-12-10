@@ -1,6 +1,6 @@
 // src/components/SwapForm/SwapFormSlippageSelector.tsx
 import { useMemo, useState } from "react";
-import type { SlippageSelectorProps } from "@/types";
+import type { SlippageSelectorProps } from "@/components/SwapForm/types";
 
 const SLIPPAGE_PRESETS = [0.1, 0.5, 1.5];
 

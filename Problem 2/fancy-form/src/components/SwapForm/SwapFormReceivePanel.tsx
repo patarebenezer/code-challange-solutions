@@ -1,6 +1,6 @@
 // src/components/SwapForm/SwapFormReceivePanel.tsx
 import { useMemo } from "react";
-import type { ReceivePanelProps } from "@/types";
+import type { ReceivePanelProps } from "@/components/SwapForm/types";
 
 export function SwapFormReceivePanel({
  fromToken,
