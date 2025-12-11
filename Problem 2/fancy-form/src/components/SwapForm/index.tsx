@@ -28,27 +28,28 @@ export function SwapForm() {
  const [submitting, setSubmitting] = useState(false);
  const [slippagePct, setSlippagePct] = useState<number>(0.5);
 
- const ownedTokens = useMemo(
+ const tokensWithBalance = useMemo(
   () =>
-   tokens.filter((t) => {
-    const bal = derived.balances?.[t.symbol] ?? 0;
-    return bal > 0;
-   }),
+   tokens.map((t) => ({
+    ...t,
+    balance: derived.balances?.[t.symbol] ?? 0,
+   })),
   [tokens, derived.balances]
  );
 
- const fromTokens = ownedTokens.length ? ownedTokens : tokens;
+ const ownedTokens = useMemo(
+  () => tokensWithBalance.filter((t) => t.balance > 0),
+  [tokensWithBalance]
+ );
+
+ const fromTokens = ownedTokens.length ? ownedTokens : tokensWithBalance;
 
  const notOwnedTokens = useMemo(
-  () =>
-   tokens.filter((t) => {
-    const bal = derived.balances?.[t.symbol] ?? 0;
-    return bal <= 0;
-   }),
-  [tokens, derived.balances]
+  () => tokensWithBalance.filter((t) => t.balance <= 0),
+  [tokensWithBalance]
  );
 
- const toTokens = notOwnedTokens.length ? notOwnedTokens : tokens;
+ const toTokens = notOwnedTokens.length ? notOwnedTokens : tokensWithBalance;
 
  const isSameToken =
   !!state.fromToken && !!state.toToken && state.fromToken === state.toToken;
