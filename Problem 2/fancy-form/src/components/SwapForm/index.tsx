@@ -17,7 +17,7 @@ const baseButton =
 const buttonClass = (enabled: boolean) =>
  baseButton +
  (enabled
-  ? " bg-emerald-500 hover:bg-emerald-400 text-black"
+  ? " bg-emerald-500 hover:bg-emerald-400 text-black cursor-pointer"
   : " bg-slate-800 text-slate-500 cursor-not-allowed");
 
 export function SwapForm() {
@@ -28,17 +28,22 @@ export function SwapForm() {
  const [submitting, setSubmitting] = useState(false);
  const [slippagePct, setSlippagePct] = useState<number>(0.5);
 
+ const isSameToken =
+  !!state.fromToken && !!state.toToken && state.fromToken === state.toToken;
+
  const canSubmit = useMemo(
   () =>
    derived.isFromValid &&
    derived.hasPrices &&
    !derived.isOverBalance &&
+   !isSameToken &&
    !loading &&
    !submitting,
   [
    derived.isFromValid,
    derived.hasPrices,
    derived.isOverBalance,
+   isSameToken,
    loading,
    submitting,
   ]
@@ -55,7 +60,11 @@ export function SwapForm() {
    actions.markTouched();
 
    if (!canSubmit) {
-    if (derived.isOverBalance) toast.error("Insufficient balance.");
+    if (isSameToken) {
+     toast.error("Cannot swap the same token. Please choose different tokens.");
+    } else if (derived.isOverBalance) {
+     toast.error("Insufficient balance.");
+    }
     return;
    }
 
@@ -75,6 +84,7 @@ export function SwapForm() {
   [
    canSubmit,
    actions,
+   isSameToken,
    derived.isOverBalance,
    derived.parsedFrom,
    derived.toAmount,
@@ -129,6 +139,12 @@ export function SwapForm() {
       label='To'
      />
 
+     {isSameToken && state.fromToken && (
+      <p className='text-xs text-amber-300'>
+       Please select a different token to swap into.
+      </p>
+     )}
+
      <SwapFormSlippageSelector value={slippagePct} onChange={setSlippagePct} />
 
      <SwapFormReceivePanel
@@ -142,10 +158,7 @@ export function SwapForm() {
       usdValue={derived.usdValue}
      />
 
-     <button
-      disabled={!canSubmit}
-      className={buttonClass(canSubmit) + " cursor-pointer mt-2"}
-     >
+     <button disabled={!canSubmit} className={buttonClass(canSubmit) + " mt-2"}>
       {submitting ? "Swapping…" : loading ? "Loading prices…" : "Swap"}
      </button>
     </div>
