@@ -37,11 +37,9 @@ const WalletPage = (props: Props) => {
   return balances
    .filter((balance) => {
     const priority = getPriority(balance.blockchain);
-    // Keep only supported blockchains with positive amounts
     return priority > -99 && balance.amount > 0;
    })
    .sort((a, b) => {
-    // higher priority first
     return getPriority(b.blockchain) - getPriority(a.blockchain);
    })
    .map((balance) => ({
@@ -59,7 +57,7 @@ const WalletPage = (props: Props) => {
     return (
      <WalletRow
       className={classes.row}
-      key={balance.currency} // or `${balance.blockchain}-${balance.currency}`
+      key={balance.currency}
       amount={balance.amount}
       usdValue={usdValue}
       formattedAmount={balance.formatted}
