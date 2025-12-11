@@ -28,6 +28,28 @@ export function SwapForm() {
  const [submitting, setSubmitting] = useState(false);
  const [slippagePct, setSlippagePct] = useState<number>(0.5);
 
+ const ownedTokens = useMemo(
+  () =>
+   tokens.filter((t) => {
+    const bal = derived.balances?.[t.symbol] ?? 0;
+    return bal > 0;
+   }),
+  [tokens, derived.balances]
+ );
+
+ const fromTokens = ownedTokens.length ? ownedTokens : tokens;
+
+ const notOwnedTokens = useMemo(
+  () =>
+   tokens.filter((t) => {
+    const bal = derived.balances?.[t.symbol] ?? 0;
+    return bal <= 0;
+   }),
+  [tokens, derived.balances]
+ );
+
+ const toTokens = notOwnedTokens.length ? notOwnedTokens : tokens;
+
  const isSameToken =
   !!state.fromToken && !!state.toToken && state.fromToken === state.toToken;
 
@@ -112,7 +134,7 @@ export function SwapForm() {
 
     <div className='space-y-3'>
      <TokenSelect
-      tokens={tokens}
+      tokens={fromTokens}
       value={state.fromToken}
       onChange={actions.selectFromToken}
       label='From'
@@ -133,7 +155,7 @@ export function SwapForm() {
      <SwapFormFlipButton onFlip={actions.flipTokens} />
 
      <TokenSelect
-      tokens={tokens}
+      tokens={toTokens}
       value={state.toToken}
       onChange={actions.selectToToken}
       label='To'
