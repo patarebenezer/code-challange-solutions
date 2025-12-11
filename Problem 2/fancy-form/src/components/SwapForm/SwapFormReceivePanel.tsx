@@ -26,7 +26,7 @@ export function SwapFormReceivePanel({
   <section className='rounded-xl bg-slate-900 border border-slate-800 p-3'>
    <div className='text-sm text-slate-400'>You receive</div>
 
-   <div className='text-2xl font-semibold'>
+   <div className='text-2xl font-semibold break-all'>
     {receiveText} <span className='text-slate-400 text-lg'>{toToken}</span>
    </div>
 
@@ -44,7 +44,7 @@ export function SwapFormReceivePanel({
      </div>
 
      {!!usdValue && (
-      <div className='text-xs text-slate-500 mt-1'>
+      <div className='text-xs text-slate-500 mt-1 break-all'>
        Order size: ~${usdValue.toFixed(2)}
       </div>
      )}
