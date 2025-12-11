@@ -1,19 +1,22 @@
-// Fixed code
+type Blockchain = "Osmosis" | "Ethereum" | "Arbitrum" | "Zilliqa" | "Neo";
 
 interface WalletBalance {
  currency: string;
  amount: number;
- blockchain: string;
+ blockchain: Blockchain;
 }
 
 interface FormattedWalletBalance extends WalletBalance {
  formatted: string;
- priority: number;
+}
+
+interface PricesMap {
+ [currency: string]: number;
 }
 
 interface Props extends BoxProps {}
 
-const PRIORITY: Record<string, number> = {
+const BLOCKCHAIN_PRIORITY: Record<Blockchain, number> = {
  Osmosis: 100,
  Ethereum: 50,
  Arbitrum: 30,
@@ -21,40 +24,49 @@ const PRIORITY: Record<string, number> = {
  Neo: 20,
 };
 
-const getPriority = (blockchain: string): number => PRIORITY[blockchain] ?? -99;
+const getPriority = (blockchain: Blockchain): number => {
+ return BLOCKCHAIN_PRIORITY[blockchain] ?? -99;
+};
 
-export const WalletPage: React.FC<Props> = ({ children, ...rest }) => {
- const balances = useWalletBalances();
- const prices = usePrices();
+const WalletPage = (props: Props) => {
+ const { children, ...rest } = props;
+ const balances = useWalletBalances() as WalletBalance[];
+ const prices = usePrices() as PricesMap;
 
- const formattedBalances = useMemo<FormattedWalletBalance[]>(() => {
+ const sortedBalances: FormattedWalletBalance[] = React.useMemo(() => {
   return balances
-   .map((b: WalletBalance) => ({
-    ...b,
-    priority: getPriority(b.blockchain),
-    formatted: b.amount.toFixed(),
-   }))
-   .filter((b) => b.priority > -99 && b.amount > 0)
-   .sort((a, b) => b.priority - a.priority);
+   .filter((balance) => {
+    const priority = getPriority(balance.blockchain);
+    // Keep only supported blockchains with positive amounts
+    return priority > -99 && balance.amount > 0;
+   })
+   .sort((a, b) => {
+    // higher priority first
+    return getPriority(b.blockchain) - getPriority(a.blockchain);
+   })
+   .map((balance) => ({
+    ...balance,
+    formatted: balance.amount.toFixed(2),
+   }));
  }, [balances]);
 
- const rows = useMemo(
+ const rows = React.useMemo(
   () =>
-   formattedBalances.map((b) => {
-    const price = prices[b.currency] ?? 0;
-    const usdValue = price * b.amount;
+   sortedBalances.map((balance) => {
+    const price = prices[balance.currency] ?? 0;
+    const usdValue = price * balance.amount;
 
     return (
      <WalletRow
       className={classes.row}
-      key={`${b.blockchain}:${b.currency}`}
-      amount={b.amount}
+      key={balance.currency} // or `${balance.blockchain}-${balance.currency}`
+      amount={balance.amount}
       usdValue={usdValue}
-      formattedAmount={b.formatted}
+      formattedAmount={balance.formatted}
      />
     );
    }),
-  [formattedBalances, prices]
+  [sortedBalances, prices]
  );
 
  return (
